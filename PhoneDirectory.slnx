@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="PhoneDirectory/PhoneDirectory.vcxproj" Id="760a2419-1767-4510-b6d4-18f455491616" />
+</Solution>
