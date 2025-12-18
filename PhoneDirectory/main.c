@@ -4,9 +4,6 @@
 
 #define MaxPerson 32
 
-// Source - https://stackoverflow.com/a
-// Posted by Johannes Schaub - litb, modified by community. See post 'Timeline' for change history
-// Retrieved 2025-12-18, License - CC BY-SA 3.0
 #define foreach(item, array) \
     for(int keep = 1, \
             count = 0,\
@@ -16,6 +13,8 @@
       for(item = (array) + count; keep; keep = !keep)
 
 #define clrscr() printf("\033[H\033[J");
+
+
 
 struct person *personArray[MaxPerson];
 
@@ -29,6 +28,23 @@ int getPersonArrayCount()
         }
     }
     return personArrayCount;
+}
+
+void addPersonToArray(struct person* new_person)
+{
+    if (getPersonArrayCount() < MaxPerson) {
+        personArray[getPersonArrayCount()] = new_person;
+    }
+    else {
+        printf("Array is full.\n");
+    }
+}
+
+void removePersonFromArray(int index)
+{
+    freePerson(personArray[index]);
+    personArray[index] = NULL;
+    reorderPersonArray();
 }
 
 void reorderPersonArray()
@@ -47,24 +63,6 @@ void reorderPersonArray()
             writeIndex++;
         }
     }
-}
-
-void addPersonToArray(struct person *new_person)
-{
-    // Ensure array bounds are not exceeded
-    if (getPersonArrayCount() < MaxPerson) {
-        personArray[getPersonArrayCount()] = new_person;
-    }
-    else {
-        printf("Array is full, cannot add more people.\n");
-    }
-}
-
-void removePersonFromArray(int index)
-{
-    freePerson(personArray[index]);
-    personArray[index] = NULL;
-    reorderPersonArray();
 }
 
 void getListPerson()
@@ -87,8 +85,7 @@ void getListPerson()
    // printf("\n[================================]");
 }
 
-int main()
-{
+void fillPersonArray() {
     personArray[0] = createPerson("Brecken", "Estes", "555555555555");
     personArray[1] = createPerson("Marianna", "Schneider", "555555555555");
     personArray[2] = createPerson("Clarissa", "Kelley", "555555555555");
@@ -102,8 +99,12 @@ int main()
     personArray[10] = createPerson("Gage", "Thomas", "555555555555");
     personArray[11] = createPerson("Landry", "McConnell", "555555555555");
     personArray[12] = createPerson("Coen", "Barron", "555555555555");
+}
 
-    //
+int main()
+{
+    fillPersonArray();
+
     int index = -1;
     while (1)
     {
@@ -132,7 +133,7 @@ int main()
             printf("\nNumara >");
             scanf_s("%s", &_phoneNumber, 64);
             addPersonToArray(createPerson(_name, _surname, _phoneNumber));
-                break;
+            break;
         case 3:
             clrscr();
 
@@ -141,6 +142,7 @@ int main()
             printf("Kisi Sil [-2 CANCEL]\n");
             printf("Siralama >");
             scanf_s("%d", &delIndex, 1);
+
             if (delIndex = -2)
             {
                 clrscr();
