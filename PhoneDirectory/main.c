@@ -14,8 +14,6 @@
 
 #define clrscr() printf("\033[H\033[J");
 
-
-
 struct person *personArray[MaxPerson];
 
 int getPersonArrayCount()
