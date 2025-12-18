@@ -94,7 +94,7 @@ void fillPersonArray() {
     personArray[5] = createPerson("Hunter", "Corona", "555555555555");
     personArray[6] = createPerson("Charleigh", "Cuevas", "555555555555");
     personArray[7] = createPerson("Amir", "Griffin", "555555555555");
-    personArray[8] = createPerson("Emirhan", "Taç", "555555555555");
+    personArray[8] = createPerson("Sir", "William", "555555555555");
     personArray[9] = createPerson("Larry", "Mathis", "555555555555");
     personArray[10] = createPerson("Gage", "Thomas", "555555555555");
     personArray[11] = createPerson("Landry", "McConnell", "555555555555");
