@@ -1,20 +1,29 @@
 ﻿#include <stdio.h>
 #include <conio.h>
 #include "Person.h"
+#include "Macro.h"
 
 #define MaxPerson 32
 
-#define foreach(item, array) \
-    for(int keep = 1, \
-            count = 0,\
-            size = sizeof (array) / sizeof *(array); \
-        keep && count != size; \
-        keep = !keep, count++) \
-      for(item = (array) + count; keep; keep = !keep)
-
-#define clrscr() printf("\033[H\033[J");
-
 struct person *personArray[MaxPerson];
+
+void reorderPersonArray()
+{
+    int writeIndex = 0;
+
+    for (int readIndex = 0; readIndex < MaxPerson; readIndex++)
+    {
+        if (personArray[readIndex] != NULL)
+        {
+            personArray[writeIndex] = personArray[readIndex];
+
+            if (writeIndex != readIndex)
+                personArray[readIndex] = NULL;
+
+            writeIndex++;
+        }
+    }
+}
 
 int getPersonArrayCount()
 {
@@ -45,23 +54,7 @@ void removePersonFromArray(int index)
     reorderPersonArray();
 }
 
-void reorderPersonArray()
-{
-    int writeIndex = 0;
 
-    for (int readIndex = 0; readIndex < MaxPerson; readIndex++)
-    {
-        if (personArray[readIndex] != NULL)
-        {
-            personArray[writeIndex] = personArray[readIndex];
-
-            if (writeIndex != readIndex)
-                personArray[readIndex] = NULL;
-
-            writeIndex++;
-        }
-    }
-}
 
 void getListPerson()
 {
@@ -73,7 +66,7 @@ void getListPerson()
     int counter = 0;
     foreach(pp, personArray) {
         if (*pp != NULL) {
-            printf("| %2d %11s  | %-25.25s  | %-*.*s  |\n", counter,(*pp)->name, (*pp)->surname, 14, 14, (*pp)->phoneNumber);
+            printf("| %2d %-11s  | %-25.25s  | %-*.*s  |\n", counter,(*pp)->name, (*pp)->surname, 14, 14, (*pp)->phoneNumber);
            // printf("\n%s %s %s", (*pp)->name, (*pp)->surname,(*pp)->phoneNumber);
         }
         counter++;

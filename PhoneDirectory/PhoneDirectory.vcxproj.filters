@@ -21,7 +21,7 @@
     <ClCompile Include="main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Phone.c">
+    <ClCompile Include="Person.c">
       <Filter>Source Files\Classes</Filter>
     </ClCompile>
   </ItemGroup>
