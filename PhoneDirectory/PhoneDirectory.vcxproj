@@ -131,6 +131,7 @@
     <ClCompile Include="Person.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AppState.h" />
     <ClInclude Include="Macro.h" />
     <ClInclude Include="Person.h" />
   </ItemGroup>

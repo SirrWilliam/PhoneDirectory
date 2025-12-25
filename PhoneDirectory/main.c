@@ -2,8 +2,11 @@
 #include <conio.h>
 #include "Person.h"
 #include "Macro.h"
+#include <Windows.h>
+#include "appState.h"
 
 #define MaxPerson 32
+#define Delay 250
 
 struct person *personArray[MaxPerson];
 
@@ -54,26 +57,47 @@ void removePersonFromArray(int index)
     reorderPersonArray();
 }
 
-
-
 void getListPerson()
 {
-    printf("+=================+============================+========[%d/%d]==+\n", getPersonArrayCount(), (sizeof(personArray) / sizeof * (personArray)));
-    printf("|      Name       |           Surname          |      Number     |\n");
-    printf("+=================+============================+=================+\n");
+
+    printf(" +=======+=================+============================+========[%d/%d]==+\n", getPersonArrayCount(), (sizeof(personArray) / sizeof * (personArray)));
+    printf(" | Index |      Name       |           Surname          |      Number     |\n");
+    printf(" +=======+=================+============================+=================+\n");
    // printf("[======= Kisi Listesi ==[%d/%d]==]", getListPersonCount(), (sizeof(personArray) / sizeof * (personArray)));
     struct person** pp;
     int counter = 0;
     foreach(pp, personArray) {
         if (*pp != NULL) {
-            printf("| %2d %-11s  | %-25.25s  | %-*.*s  |\n", counter,(*pp)->name, (*pp)->surname, 14, 14, (*pp)->phoneNumber);
+            printf(" |  %2d   | %-11s     | %-25.25s  | %-*.*s  |\n", counter,(*pp)->name, (*pp)->surname, 14, 14, (*pp)->phoneNumber);
            // printf("\n%s %s %s", (*pp)->name, (*pp)->surname,(*pp)->phoneNumber);
         }
         counter++;
-
     }
-    printf("+=================+============================+=================+\n");
+    printf(" +=======+=================+============================+=================+\n");
    // printf("\n[================================]");
+}
+
+void setWindow()
+{
+    SetConsoleTitleA("Phone Directory");
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    HWND hwnd = GetConsoleWindow();
+
+    LONG style = GetWindowLong(hwnd, GWL_STYLE);
+    style &= ~WS_SIZEBOX & ~WS_MAXIMIZEBOX;
+    SetWindowLong(hwnd, GWL_STYLE, style);
+
+    HMENU menu = GetSystemMenu(hwnd, FALSE);
+    DeleteMenu(menu, SC_SIZE, MF_BYCOMMAND);
+    DeleteMenu(menu, SC_MAXIMIZE, MF_BYCOMMAND);
+    DrawMenuBar(hwnd);
+
+    SHORT cols = 75, rows = 30;
+    SMALL_RECT win = { 0, 0, cols - 1, rows - 1 };
+    COORD buf = { cols, rows };
+
+    SetConsoleWindowInfo(hOut, TRUE, &win);
+    SetConsoleScreenBufferSize(hOut, buf);
 }
 
 void fillPersonArray() {
@@ -92,18 +116,211 @@ void fillPersonArray() {
     personArray[12] = createPerson("Coen", "Barron", "555555555555");
 }
 
+void printTitle()
+{
+    printf("                           PHONE DIRECTORY v0.5                            \n");
+    printf("           (C) NOCOPYRIGHT 2025 EMIRHAN TAC, PIRI REIS UNIVERSITY          \n\n\n");
+}
+
+int isNumber(char* stringArray)
+{
+
+    //go through each character
+    //location in the array until
+    //we reach the null character (end of input)
+    for (int i = 0; stringArray[i] != '\000'; i++)
+    {
+        if (isdigit(stringArray[i]) == 0)//if the current character is not a digit....
+            return 0; //return false and end function here
+
+    }
+
+    return 1;//return true since the entire array contained numeric characters
+}
+
+int readInt(const char* prefix, int *outInt)
+{
+    char buffer[64];
+
+    while (1) {
+        printf("%s < ", prefix);
+
+        if (!fgets(buffer, sizeof buffer, stdin)) {
+            puts("INPUT ERROR OR EOF");
+            return 0; // fail
+        }
+
+        size_t len = strlen(buffer);
+
+        if (len > 0 && buffer[len - 1] == '\n') {
+            buffer[len - 1] = '\0';
+            --len;
+        }
+
+        if (len == 0) {
+            puts("EMPTY INPUT!");
+            continue;
+        }
+
+        if (!isNumber(buffer)) {
+            puts("NUMBER ONLY!");
+            continue;
+        }
+
+        *outInt = atoi(buffer);
+
+        return 1;
+    }
+}
+
+int readString(const char* prefix, char* outStr, size_t outSize)
+{
+    char buffer[64];
+
+    while (1) {
+        printf("%s < ", prefix);
+
+        if (!fgets(buffer, sizeof buffer, stdin)) {
+            puts("INPUT ERROR OR EOF");
+            return 0; // fail
+        }
+
+        size_t len = strlen(buffer);
+
+        if (len > 0 && buffer[len - 1] == '\n') {
+            buffer[len - 1] = '\0';
+            --len;
+        }
+
+        if (len == 0) {
+            puts("EMPTY INPUT!");
+            continue;
+        }
+
+        if (len >= outSize) {
+            puts("INPUT TOO LONG!");
+            continue;
+        }
+
+
+        if (strcpy_s(outStr, outSize, buffer) != 0) {
+            puts("COPY ERROR");
+            return 0;
+        }
+
+        return 1; 
+    }
+}
+
+
 int main()
 {
+    setWindow();
     fillPersonArray();
 
-    int index = -1;
+    AppState state = STATE_WAIT_START;
+    int key;
+
     while (1)
     {
-        printf("\nTelefon Rehber\n 1.Listele\n 2.Yeni Kisi Ekle\n 3.Kisi Sil\n");
-        printf("> ");
-        scanf_s("%d", &index, 1);
+        switch (state)
+        {
+            case STATE_WAIT_START:
+                clrscr();
+                printTitle();
+                printf("                         PRESS ANY KEY TO CONTINUE                         \n");
+                _getch();
+                state = STATE_MAIN_MENU;
+                break;
+            case STATE_MAIN_MENU:
+                clrscr();
+                printTitle();
+                printf("SAVED PERSON COUNT: %d\n", getPersonArrayCount());
+                printf("\n\n L-LIST PERSON   | N-ADD NEW PERSON | D-DELETE PERSON \n U-UPDATE PERSON | ESC-EXIT\n");
 
-        switch (index)
+                key = _getch();
+                switch (key)
+                {
+                case 'l':
+                case 'L':
+                    Sleep(Delay);
+                    state = STATE_LIST;
+                    break;
+
+                case 'n':
+                case 'N':
+                    Sleep(Delay);
+                    state = STATE_ADD;
+                    break;
+
+                case 'd':
+                case 'D':
+                    Sleep(Delay);
+                    state = STATE_DELETE;
+                    break;
+                case 27:
+                    Sleep(Delay);
+                    clrscr();
+                    exit(EXIT_SUCCESS);
+                    break;
+                }
+                break;
+            case STATE_LIST:
+                clrscr();
+                printTitle();
+                getListPerson(personArray);
+                printf("\nB-BACK\n");
+
+                key = _getch();
+                if (key == 'b' || key == 'B')
+                {
+                    Sleep(Delay);
+                    state = STATE_MAIN_MENU;
+                }
+                break;
+            case STATE_ADD:
+                clrscr();
+                printTitle();
+
+                char _name[64];
+                char _surname[64];
+                char _phoneNumber[64];
+
+                printf("ADD NEW PERSON\n");             
+                readString("NAME", _name, sizeof _name);
+                readString("SURNAME", _surname, sizeof _surname);
+                readString("NUMBER", _phoneNumber, sizeof _phoneNumber);
+                addPersonToArray(createPerson(_name, _surname, _phoneNumber));
+                Sleep(Delay);
+                state = STATE_MAIN_MENU;
+                break;
+            case STATE_DELETE:
+                printTitle();
+                clrscr();
+
+                int delIndex = 0;
+
+                printf("DELETE PERSON [-1 CANCEL]\n");
+                readInt("INDEX", &delIndex);
+
+
+                if (delIndex == -1)
+                {
+                    clrscr();
+                    Sleep(1000);
+                    state = STATE_MAIN_MENU;
+                }
+                removePersonFromArray(delIndex);
+                Sleep(Delay);
+                state = STATE_MAIN_MENU;
+                break;
+        }
+      
+    }
+ 
+   
+   
+      /*  switch (index)
         {
         case 1:
             clrscr();
@@ -118,7 +335,7 @@ int main()
 
             printf("Yeni Kisi Ekle\n");
             printf("Ad >");
-            scanf_s("%s", &_name,64);
+            scanf_s("%s", &_name, 64);
             printf("\nSoyad >");
             scanf_s("%s", &_surname, 64);
             printf("\nNumara >");
@@ -144,7 +361,6 @@ int main()
         default:
             index = -1;
             break;
-        }
-    }
+        }*/
     return 0;
 }
