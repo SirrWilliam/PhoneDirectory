@@ -28,6 +28,14 @@ void reorderPersonArray()
     }
 }
 
+int isPersonExist(int index)
+{
+    if (personArray[index] != NULL)
+        return 1;
+    else
+        return 0;
+}
+
 int getPersonArrayCount()
 {
     int personArrayCount = 0;
@@ -49,6 +57,7 @@ void addPersonToArray(struct person* new_person)
         printf("Array is full.\n");
     }
 }
+
 
 void removePersonFromArray(int index)
 {
@@ -124,7 +133,6 @@ void printTitle()
 
 int isNumber(char* stringArray)
 {
-
     //go through each character
     //location in the array until
     //we reach the null character (end of input)
@@ -202,7 +210,6 @@ int readString(const char* prefix, char* outStr, size_t outSize)
             continue;
         }
 
-
         if (strcpy_s(outStr, outSize, buffer) != 0) {
             puts("COPY ERROR");
             return 0;
@@ -258,6 +265,12 @@ int main()
                     Sleep(Delay);
                     state = STATE_DELETE;
                     break;
+
+                case 'u':
+                case 'U':
+                    Sleep(Delay);
+                    state = STATE_UPDATE;
+                    break;
                 case 27:
                     Sleep(Delay);
                     clrscr();
@@ -284,7 +297,7 @@ int main()
 
                 char _name[64];
                 char _surname[64];
-                char _phoneNumber[64];
+                char _phoneNumber[13];
 
                 printf("ADD NEW PERSON\n");             
                 readString("NAME", _name, sizeof _name);
@@ -295,16 +308,16 @@ int main()
                 state = STATE_MAIN_MENU;
                 break;
             case STATE_DELETE:
-                printTitle();
                 clrscr();
+                printTitle();
 
                 int delIndex = 0;
 
-                printf("DELETE PERSON [-1 CANCEL]\n");
+                printf("DELETE PERSON [999 CANCEL]\n");
                 readInt("INDEX", &delIndex);
 
 
-                if (delIndex == -1)
+                if (delIndex == 999)
                 {
                     clrscr();
                     Sleep(1000);
@@ -314,53 +327,49 @@ int main()
                 Sleep(Delay);
                 state = STATE_MAIN_MENU;
                 break;
+            case STATE_UPDATE:
+                clrscr();
+                printTitle();
+
+                int updateIndex = 0;
+
+                printf("UPDATE PERSON INDEX\n");
+                readInt("INDEX", &updateIndex);
+
+                if (!isPersonExist(updateIndex))
+                {
+                    printf("PERSON NOT FOUND!");
+                    Sleep(Delay);
+                    continue;
+                }
+
+                char _updateName[64];
+                char _updateSurname[64];
+                char _updatePhoneNumber[13];
+
+                readString("NEW NAME", _updateName, sizeof _updateName);
+                readString("NEW SURNAME", _updateSurname, sizeof _updateSurname);
+                readString("NEW NUMBER", _updatePhoneNumber, sizeof _updatePhoneNumber);
+
+                struct person* p = personArray[updateIndex];
+
+                free(p->name);
+                p->name = malloc(strlen(_updateName) + 1);
+                strcpy_s(p->name, strlen(_updateName) + 1, _updateName);
+
+                free(p->surname);
+                p->surname = malloc(strlen(_updateSurname) + 1);
+                strcpy_s(p->surname, strlen(_updateSurname) + 1, _updateSurname);
+
+                strcpy_s(p->phoneNumber, sizeof(p->phoneNumber), _updatePhoneNumber);
+
+                printf("PERSON UPDATED!");
+
+                Sleep(Delay);
+                state = STATE_MAIN_MENU;
+                break;
         }
       
     }
- 
-   
-   
-      /*  switch (index)
-        {
-        case 1:
-            clrscr();
-            getListPerson(personArray);
-            break;
-        case 2:
-            clrscr();
-
-            char _name[64];
-            char _surname[64];
-            char _phoneNumber[64];
-
-            printf("Yeni Kisi Ekle\n");
-            printf("Ad >");
-            scanf_s("%s", &_name, 64);
-            printf("\nSoyad >");
-            scanf_s("%s", &_surname, 64);
-            printf("\nNumara >");
-            scanf_s("%s", &_phoneNumber, 64);
-            addPersonToArray(createPerson(_name, _surname, _phoneNumber));
-            break;
-        case 3:
-            clrscr();
-
-            int delIndex = -1;
-
-            printf("Kisi Sil [-2 CANCEL]\n");
-            printf("Siralama >");
-            scanf_s("%d", &delIndex, 1);
-
-            if (delIndex = -2)
-            {
-                clrscr();
-                break;
-            }
-            removePersonFromArray(delIndex);
-            break;
-        default:
-            index = -1;
-            break;
-        }*/
     return 0;
 }
